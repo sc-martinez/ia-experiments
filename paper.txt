@@ -1,0 +1,172 @@
+Aspect-Oriented Code Obfuscation
+
+Keshnee Padayachee
+ University of South Africa
+ Pretoria, South Africa
+padayk@unisa.ac.za
+
+
+Abstract— This paper reports on an exploratory study investigating the feasibility of using aspect-oriented constructs to instrument objects for the purposes of code obfuscation. With Java programs it is difficult to protect the intellectual property rights and secret information in untrusted environments. Consequently the utilization of software obfuscation techniques has become relevant.  It has been found that Aspect-Oriented programming might be abused to overcome advanced code obfuscation used in Java Bytecode.  In this paper possible intervention strategy to prevent these types of attacks using aspect-oriented programming language such as AspectJ is presented. 
+Index Terms—aspect-oriented programming, code obfuscation 
+ Introduction
+The aspect-oriented paradigm has been recommended for several design issues, such as security [1, 2], persistence [3], exception handling [4] and program instrumentation [5, 6]. The principal argument supporting the utilization of aspect-oriented programming (AOP) to develop software is that some software requirements tend to crosscut objects, resulting in the code tangling phenomenon. Aspect-orientation has the potential to enhance the implementation of such crosscutting concerns in terms of reusability and extensibility, thereby improving the robustness and maintainability of a system. As the popularity of AOP matures [7], the issue surrounding exploiting aspect-oriented programs for malicious purposes is of critical concern.  It has been found that AOP may now be abused for sinister purposes such as, overcoming code obfuscation and thereby modifying software code to render security protection mechanisms ineffective.  The aim of this paper is to investigate aspect-oriented tampering and propose a possible intervention to this problem. 
+A code obfuscator is a tool which converts a program into an equivalent one that is more difficult to understand and reverse engineer [8]. There exist several obfuscation tools for preventing Java bytecode from being decompiled. Most of these tools simply scramble the names of the identifiers stored in a bytecode by substituting the identifiers with meaningless names [9]. It has been found that AOP may expose code obfuscators and render systems vulnerable to malicious purposes [10]. For instance, to extract propriety algorithms, or to subvert protection checks of commercial Java packages. Unfortunately encryption cannot resolve these type of problems since encrypted programs must be eventually decrypted in to executable programs and the adversaries can intercept them in hostile environments[11]. Chen and Chen [10] have shown that is possible for the join point model and the code instrumentation mechanism of aspect-oriented programming to render code obfuscation ineffective for some intended protection. They highlighted the following concern: the 'binary weaving tools of AOP may become a new breed of productivity tools that facilitate the tampering of software integrity and malicious attacks'.  The realization of software with tamper-resistance, which means the difficulty to read and modify the software in an unauthorized manner, becomes increasingly important.  Software obfuscation transforms a program into a tamper resistant form [11]. This paper presents an exploratory study on aspect instrumentation for the purposes of obfuscation. Zhang and Wen [12] have also considered using AOP to protect Java source code, however they focus on enlarging the range of encryption to protect J2EE applications. It is important to note that although aspect-orientation is a form of instrumentation, it is not instrumentation in the typical sense as the code instrumented may be an essential requirement to the final application such as error handling or exception handling. This type of instrumentation is more formalized than typical instrumentation as it is language-based.  It is much more precise and pervasive than traditional methods.
+This paper does not present any new techniques for code obfuscation nor is the technique presented evaluated with respect to their potency that is, to 'what degree is a human reader confused' [8]. Additionally the author does not negate the need for obfuscators in general. This paper addresses one particular type of attack when code obfuscation may not be adequate. That is specifically when 'malicious users with rudimentary knowledge of Java byte code and cryptography can exploit the join point model and code instrumentation of AspectJ to render code obfuscation and string encryption ineffective for some intended protection' [10].  The rest of the paper is structured as follows.  Section 2, elaborates on aspect-oriented programming in general. In Sections 3 and 4 explores how aspect-oriented programming may be exploited for malicious purposes and possible ways to avert to these types of attacks, respectively.  Finally, Section 5 concludes, with possible future research opportunities.
+
+Aspect-Oriented Programming
+The object-oriented paradigm was found to be inadequate in terms of design and implementation of crosscutting concerns, as there is no elegant way of modularising these crosscutting concerns. AOP provides explicit language support for modularising design decisions that crosscut a functionally decomposed program [13], allowing the developer to maintain the code (crosscutting functionality) in a modularised form. It is important to note that aspect-orientation maintains all the benefits of the object-oriented paradigm and should be viewed as an extension rather than a replacement of object-oriented technologies.
+An aspect-oriented system consists of two concepts: components and aspects. The components form the atomic and loosely coupled concerns of the system, and the aspects implement the additional crosscutting functionality of the system. According to Kiczales et al. [14], aspects consist of constructs named pointcuts and advices. A join point is a definable interception point in a system where the aspect could possibly take action.  Specifically, join points refer to well-defined points in a program's execution such as when an object is instantiated, when a method is called, or when an exception is thrown, etc. The pointcuts are a set of join points described by a pointcut expression. An advice defines the functionality to be executed before (i.e. the before advice) or after (i.e. the after advice) a defined join point, or even possibly instead of the defined join point (i.e. the around advice). An aspect weaver is then used to merge components and aspects into a final program. 
+Aspect-orientation has the potential to reduce the complexity of programs and to improve maintainability of software due the additional level of abstraction offered. However, despite the benefits offered by aspect-orientation, there are some drawbacks. Alexander and Bieman [15] maintain that as a result of the weaving process, the isolation of faults will be difficult, as faults may reside in the source code, the aspect, or the woven code. Another challenge, as noted by Chen [16], is that of understandability – a many-to-many relationship may exist between aspects and the primary abstractions they integrate with, thus potentially requiring understanding of many other aspects to understand only one. 
+Typically when a programmer cannot decipher code, he/she will instrument such code to determine the context. There are several methods of program instrumentation such as binary code transformation, link time manipulation or source code transformation. Typically program analysis tools often rely on profiling information obtained from the programs they analyse. Obtaining such information can be a tedious task and the data achieved may be more abstract and non-specific [5, 6]. The more generic the instrumentation approach, the more abstract is the achievable data. Aspect-orientation resolves this problem, as the code introduced can extract data in more controlled way.  However just as AOP may be used for useful purposes, it may be exploited for malicious purposes. 
+using aspect-oriented programming for malicious purposes
+Soliciting information about software for malicious purposes may be achieved with designing tracing aspects using the pointcut and advice mechanisms of AspectJ. Control flow tracing supplies the calling sequence of Java methods. While data flow based tracing employs field access join points to track where decoding and checking related strings are accessed. Once the exact code segment that reports the check result is located, then one may devise an aspect that will intercept a request to data checking, and a return forged success result. In view of the fact that encryption and decryption of string literals are not a standard service of Java Runtime, at some point the program under attack must decrypt the string literal by itself before they are displayed to the user. Control flow based tracing generates a method call log that will assist a malicious individual with identifying these methods, with the intent of subverting them.
+These types attack begins with bottom-up control flow tracing and data flow tracing.  Both forms of tracing rely on using thisJoinPoint, or thisEnclosingJoinPointStaticPart variables that are available in AspectJ.  These variables are visible in an advice and each is bound to an object that encapsulates some of the context of the advice's current or enclosing join point. (AspectJ has three such variables thisJoinPoint, thisJoinPointStaticPart, and thisEnclosingJoinPointStaticPart.) These variables exist because some pointcuts may pick out very large collections of join points [17] and these variables can be used to differentiate join points. For example, these variables can provide information regarding the methods called and arguments passed at a specific point in the program's execution.  If this information trawling exercise were to be prevented in the first instance and obfuscated information returned then further attacks may become much more difficult to realize.
+The author recommends that every shipped system should have built in aspect that can not only thwart an attack from any malicious aspect but also return obfuscated information. This aspect which essentially prevents information flow and obfuscates information should not have any impact on the main program and only becomes active when another aspect is attempting to solicit information from the system. As demonstrated in figure 1, the Obfuscator Aspect sends back obfuscated information to the malicious user thus preventing any further attack.
+
+
+Showing how a Malicious Aspect can be thwarted with obfuscated information
+
+Practical example of aspect-oriented obsfuscation
+A simple program called SJEA which encrypts a file was downloaded from Google to demonstrate how encryption methods may be revealed with AOP. SJEA is a simple command-line binary encryption algorithm written in JAVA. As [10] has shown,  aspect-orientation may utilized to expose and subvert encryption methods. It found that using an aspect-oriented programming language such as AspectJ, one can easily determine the methods used for encryption.  An aspect named Trace was use to trace through SJEA's execution history (Listing 1). It works by exploiting the thisJoinPointStaticPart variable, which provides reflective information about the current join point. The method getSignature() is used obtain information about this variable. The aspect-oriented paradigm allows a more generic implementation of the Trace aspect through the use of wildcards.  Using wildcards eliminates the need for explicit naming [18].  Hence this pointcut will track any method executed in a program's history. Listing 2 shows how the following Aspect Trace exposes the methods for encryption in program SJEA.
+Listing 1: Aspect Trace
+public aspect Trace {
+before():  execution(* *.*(..)) {  
+System.out.println(thisJoinPointStaticPart.
+	getSignature());
+}
+}
+
+Listing 2: Program SJEA advised by Aspect Trace
+void enc.main(String[])
+SJEA 1.0 ENCRYPT
+Usage: java enc <input-file> <password>
+Input file size: 10 bytes
+> Encrypting...
+> Generating checksum...int enc.create(String)
+byte[] enc.createChecksum(String)
+.
+MD5: 5bdf74912a51c34815f11e9a3d20b609
+DONE!
+Output file "c:\test\keshnee.txt.enc" created.
+File size: 15 Bytes
+Checksum file "c:\test\keshnee.txt.md5" created.
+Password length: 7 character(s)
+
+The solution to this problem was to define an aspect to obfuscate the method names so that is indecipherable to the attacker. Aspect XYZ was developed to counter this type of "attack".  The pointcut risk1 picks out each join point where a getSignature() method is being called. As this is an indication that a joinpoint is being exposed. The keyword within() is used to define scope, in this case pointcut risk1 does not pick joinpoints within aspect XYZ. Once this joinpoint is identified then a method to obfuscate this joinpoint should be used. In order to improve the modularity of the aspect, a method obfuscate() was defined for this purpose. Unfortunately this presented a problem as aspect Trace's pointcut picks up obsfuscate() as a method to expose. This resulted in infinite recursive calls from Aspects XYZ and Trace. If no special precautions are taken, aspects which advise other aspects can easily and unintentionally advise each other recursively. The resolution to this problem was to create another pointcut preventcrosscut which essentially wrapped around the pointcut from Trace and prevented Trace from exposing this joinpoint as well. This pointcut then performed the obfuscation. Please note as the paper does not focus on obfuscation techniques, a rudimentary method was applied where the all method names were given aliases.  For example method createCheckSum() was changed to "Rt m(Ar2 x)" which serves the purpose of obfuscation. Name obfuscation is the process of using meaningless or difficult to read string to replace the variable name [12]. However as code defined for obfuscation was separated - other more advanced and verifiable techniques may be substituted. It is plausible that preventcrosscut could be extended to avert all joinpoints picked by aspect Trace, however it could prevent other innocuous aspects that were in the original system from delivering a function that is essential to the system. The around advise for pointcut risk1, obfuscates the joinpoint that Trace was attempting to expose in system. As getSignature() returns a signature, the advice is forced to return the same type of object otherwise the system will throw an exception. The advice for risk1 returns the signature of the joinpoint in aspect Trace instead of the joinpoint in program SJEA. The output produced with both aspects Trace and XYZ advising program SJEA is shown in Listing 4.
+Listing 3: Aspect XYZ
+public aspect XYZ {
+pointcut risk1(Object js):  !within(XYZ)  && call(* *.getSignature(..)) && target(js);
+Object around(Object js): risk1(js){	
+	obsfuscation(js);
+	return thisJoinPoint.getSignature();
+}
+
+void obsfuscation(Object obj){
+//Do nothing as the Aspect Tracer will pick up this method to advise
+}
+pointcut preventcrosscut(Object obj): within(XYZ) && 
+call( * *.obsfuscation(..)) && args(obj) ;
+void around(Object obj):preventcrosscut(obj){  
+	String s = obj.toString();
+	if (s.contains("create"))  {
+		s = "Rt m(Arg1 x)";
+	}
+	if (s.contains("createChecksum")){
+		s = "Rt m(Ar2 x)";
+	}
+	if (s.contains( "main")){
+		s = "Rt. m(Arg3 x)";
+	}
+	System.out.println(s);	
+}
+}
+
+
+
+Listing 4: Program SJEA advised by both Aspect Trace and Aspect XYZ
+Rt. m(Arg3 x)
+Signature org.aspectj.lang.JoinPoint.StaticPart.getSignature()
+SJEA 1.0 ENCRYPT
+Usage: java enc <input-file> <password>
+Input file size: 10 bytes
+
+> Encrypting...
+
+> Generating checksum...Rt m(Arg1 x)
+Signature org.aspectj.lang.JoinPoint.StaticPart.getSignature()
+Rt m(Arg1 x)
+Signature org.aspectj.lang.JoinPoint.StaticPart.getSignature()
+.
+MD5: 5bdf74912a51c34815f11e9a3d20b609
+DONE!
+Output file "c:\test\keshnee.txt.enc" created.
+File size: 15 Bytes
+Checksum file "c:\test\keshnee.txt.md5" created.
+Password length: 7 character(s)
+
+The solution presented is simplistic however, attackers can easily rewrite this Trace aspect in other ways to illicit the same information and foil Aspect XYZ in more innocuous ways. For instance with Java, println statements could be used to expose a joinpoint. There four possible ways of rewriting the same code to gather similar information. We now explore four such cases. We termed these risks, The first risk, is namely using method calls on the thisJoinPoint, thisJoinStaticPart or thisEnclosingJoinPointStaticPart such as getSignature().  Aspect XYZ can easily obfuscate these calls. If method call is made to some other member function such as getSourceLocation(), getArgs() or getKind() then Aspect XYZ would not be able to handle these. However pointcut risk1 (Listing 5) could be expanded to handle all of these cases. Of course the return type will be have adapted accordingly otherwise the system will throw an exception.  The next risk, is when reflective information can be concatenated with string. Currently Aspect XYZ cannot identify this type of attack. For instance, the following statement will be overlooked by Aspect XYZ:-
+ System.out.println("thisJoinPoint" +thisJoinPoint)
+
+In this case, incorporating pointcut risk2 to Aspect XYZ (see Listing 2) will be one way of subverting this type of statement. Pointcut risk2, essentially checks every string that is passed to a function, which then obfuscates it if is revealing any critical information. This pointcut could also be useful in preventing illegal flows. Information is exchanged among by messages in object-oriented systems. An illegal flow arises when information is transmitted from one object to another object in violation of the information flow security policy [19] .
+The next two risks are similar but require two different pointcuts to subvert them. These risks, involve merely passing either thisJoinPoint, thisJoinStaticPart or thisEnclosingJoinPointStaticPart variable to a function which may then expose it. For example:- "System.out.println(thisJoinPoint);".   Here two poincuts risk3 and risk4 were developed which essentially tracks down any join point where thisJoinPoint was being passed to any method. Whereas risk4 tracks down any join point where thisJoinPointStaticPart or thisEnclosingJoinPointStaticPart is being passed as an argument.
+Listing 5: Pointcuts to be integrated  into Aspect XYZ
+pointcut risk1(Object js):  !within(XYZ)  &&  (call(* *.getSignature(..)) 
+	||  call(* *.getArgs(..) )				||  call * *.getKind (..) ) etc..)
+	() && target(js); 
+
+pointcut risk2(String s):  !within(XYZ)  &&  call(void *.*(..)) && args(..,s) ;
+void around(String s): risk2(s){	
+	obsfuscation(s);
+}
+
+pointcut risk3(JoinPoint jp):  !within(XYZ)  &&  call(void *.*(..)) && args(jp,..);
+void  around(JoinPoint jp): risk3(jp){
+	System.out.println("risk 3 - output only joinpoint" +jp);
+ 	obsfuscation(jp);
+}
+
+pointcut risk4(JoinPoint.StaticPart jp):  !within(XYZ)  &&  call(void *.*(..)) && args(jp,..);
+void  around(JoinPoint.StaticPart jp): risk4(jp){	
+	System.out.println("risk4 - outupt only staticpart" +jp);
+	obsfuscation(jp);
+}  
+Conclusion
+Obfuscators are a necessary requirement however as shown by Chen and Chen [10], attackers with a rudimentary knowledge of Java byte code and cryptography can exploit the join point model and code instrumentation of AspectJ to render code obfuscation, string encryption and other security mechanisms ineffective for some intended protection. In the worked example, it was demonstrated how a program may be abused.  The author then presented an approach to thwart this type of attacks using aspect-oriented programming and obfuscation to prevent reverse-engineering. Chen and Chen [10] suggests that AspectJ should provide a mechanism to "hide" or encapsulate critical join points in a program. However this is subject to whether a programmer deems a point in a program's execution as critical or in fact bears in mind to do so. Unfortunately, incorporating security into software development takes time and developers tend to focus more on the features of the software application. The author does not proclaim this solution could prevent all possible attacks however it is step forward towards trying to prevent this type of attacks. This is analogous to anti-viruses, the attackers will always figure out other ways of defeating anti-virus packages. However this does not negate the need for this type of software. Future research would involve in determining the performance issues relating to aspect-oriented obfuscation.
+References
+
+
+De Win, B., W. Joosen, and F. Piessens, Developing Secure Applications through Aspect-Oriented Programming, in Aspect-Oriented Software Development, M. Aksit, et al., Editors. 2002, Addison-Wesley: Boston. p. 633–650.
+Vanhaute, B. and B. De Win, AOP, Security and Genericity, in 1st Belgian AOSD Workshop. 2001: Vrije Universiteit Brussel, Brussels, Belgium. p. 1-2.
+Rashid, A. and R. Chitchyan. Persistence as an aspect. in Proceedings of the 2nd International Conference on Aspect-Oriented Software Development. 2003. Enschede, The Netherlands.
+Lippert, M. and C.V. Lopes. A study on exception detection and handling using aspect-oriented programming. in Proceedings of the 22nd International Conference on Software Engineering. 2000. Limerick, Ireland.
+Deters, M. and R.K. Cytron, Introduction of Program Instrumentation using aspects, in Proceedings of the OOPSLA 2001 (Workshop on Advanced Separation of Concerns). 2001: Tampa Bay, Florida.
+Debusmann, M. and K. Geihs. Efficient and Transparent Instrumentation of Application Components Using an Aspect-Oriented Approach. in 14th IFIP/IEEE Workshop on Distributed Systems: Operations and Management (DSOM 2003). 2003.
+Padayachee, K. and J.H.P. Eloff. The Next Challenge: Aspect-Oriented Programming. in Proceedings of the Sixth IASTED International Conference on Modelling, Simulation and Optimization. 2006. Gaborone, Botswana: ACTA Press.
+Collberg, C., C. Thomborson, and D. Low, A Taxonomy of Obfuscating Transformations. 1998.
+Chan, J. and W. Yang, Advanced obfuscation techniques for java bytecode. Journal of Systems and Software, 2004. 71(1-2): p. 1-10.
+Chen, K. and J. Chen. On Instrumenting Obfuscated Java Bytecode with Aspects. in SESSO6. 2006. Shanghai, China.
+Sakabe, Y., M. Soshi, and A. Miyaji, Java Obfuscation Approaches to Construct Tamper-Resistant Object-Oriented Programs. Information and Media Technologies, 2006. 1(1): p. 134-146.
+Zhang, X. and Q. Wen. AOP-Based J2EE Source Code Protection. in Computational Intelligence and Security Workshops, 2007. CISW 2007. 2007.
+Walker, R.J., E.L.A. Baniassad, and G.C. Murphy. An initial assessment of aspect-oriented programming. in Proceedings of the 21st international conference on Software engineering. 1999. Los Angeles, California.
+Kiczales, G., et al., Getting Started with AspectJ. Communications of the ACM, 2001. 44(10): p. 59-65.
+Alexander, R.T. and J.M. Bieman, Challenges with Aspect-oriented Technology, in ICSE Workshop on Software Quality. 2002: Orlando, Flordia.
+Chen, L., Aspect-Oriented Programming in Software Engineering. 2004, Wake Forest University, Department of Computer Science.
+Development Aspects.  2009  [cited; Available from: http://www.eclipse.org/aspectj/doc/released/progguide/examples-development.html (Last access 1/02/2009).
+Kiczales, G., et al. Semantics-Based Crosscutting in AspectJ. in Workshop on Multi-Dimensional Separation of Concerns inSoftware Engineering (ICSE 2000). 2000.
+Samarati, P., et al., Information Flow Control in Object-Oriented Systems. IEEE Transactions on Knowledge and Data Engineering, 1997. 9(4): p. 624-538.
+
+
+
+
+
+
+
+
+
+
+			     
+
+978-1-4244-3519-7/09/$25.00 ©2009 IEEE		                            ICCSE 2009
+
+
+
